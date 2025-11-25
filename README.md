@@ -46,5 +46,3 @@ Evaluation metrics:
 
 ---
 
-## 📂 Project Structure
-
