@@ -1,48 +1,29 @@
-# EEG Signal Processing & Machine Learning Pipeline
+# Parkinson's EEG Analysis & Counterfactual Explanations
 
-This repository contains a complete end-to-end workflow for EEG signal processing, time–frequency decomposition, feature engineering, and machine-learning classification. The pipeline is implemented in a single Jupyter notebook (`main.ipynb`) and includes data preparation, modeling, evaluation, and explainability tools.
+This project implements a machine learning pipeline for detecting Parkinson's Disease (PD) from EEG signals. It utilizes **Multivariate Direct Mode Decomposition (MDMD)** for feature extraction and a **Linear SVM** for classification. Furthermore, it employs **Counterfactual Explanations** (using the Native Guide method) to provide interpretable insights into *why* a specific segment was classified as PD.
 
----
+##  Pipeline Overview
 
-## 📌 Features
+1.  **Data Loading & Preprocessing**:
+    * Loads EEG data in BIDS format using `mne`.
+    * Applies notch filtering (50/60Hz) and resamples to 512Hz.
+    * Segments data into 2-second non-overlapping windows.
+2.  **Signal Decomposition (MDMD)**:
+    * Constructs multichannel Hankel trajectory matrices.
+    * Performs SVD to decompose signals into intrinsic **Modes** (Trends/Oscillations).
+    * Reconstructs signals using Diagonal Averaging.
+3.  **Feature Extraction**:
+    * Extracts 3 features per mode/channel: **Frequency ($f_q$), Power ($P_q$), Amplitude ($S_q$)**.
+4.  **Classification**:
+    * Trains a Linear Support Vector Machine (SVM) with Stratified K-Fold Cross-Validation.
+    * Optimizes hyperparameters using Grid Search.
+5.  **Explainability (XAI)**:
+    * Generates **Counterfactuals**: Finds the minimal changes required to flip a "Parkinson's" prediction to "Healthy."
+    * Uses the **Native Guide** method: Interpolates the patient's data towards the nearest existing "Healthy" sample to ensure biological plausibility.
 
-### **1. Data Preprocessing**
-- Filtering (bandpass 0.5–70 Hz, notch filters, etc.)
-- Channel cleaning & metadata handling
-- Signal normalization
-- Segmentation into fixed-length windows (e.g., 2-second windows)
+##  Prerequisites
 
-### **2. Signal Decomposition**
-- Multi-mode decomposition (MDMD-style / empirical mode methods)
-- Extraction of intrinsic modes (IMFs)
-- Reconstruction of filtered signals from selected modes
-- Visualization of decomposed components
+Ensure you have Python 3.8+ and the following libraries installed:
 
-### **3. Feature Engineering**
-- Time-domain features (RMS, variance, Hjorth parameters, etc.)
-- Frequency-domain features (FFT-based bands)
-- Entropy-based features
-- Outputs consolidated into a labeled DataFrame for ML
-
-### **4. Machine Learning**
-Includes models such as:
-- Logistic Regression  
-- Random Forest  
-- SVM  
-- XGBoost / Gradient Boosting  
-- Cross-validation (StratifiedKFold)  
-- Hyperparameter tuning (GridSearchCV)
-
-Evaluation metrics:
-- Accuracy, Precision, Recall, F1
-- ROC-AUC
-- Confusion Matrix
-- Matthews Correlation Coefficient (MCC)
-
-### **5. Explainability**
-- SHAP-style local explanations
-- Counterfactual analysis for individual EEG windows
-- Feature importance visualizations
-
----
-
+```bash
+pip install numpy pandas scipy scikit-learn matplotlib mne joblib
